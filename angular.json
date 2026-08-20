@@ -1,0 +1,203 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "frontend": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:application",
+          "options": {
+            "allowedCommonJsDependencies": [
+              "vis-network",
+              "clone-deep"
+            ],
+            "aot": true,
+            "outputPath": {
+              "base": "dist/frontend"
+            },
+            "index": "src/index.html",
+            "polyfills": [
+              "src/polyfills.ts",
+              "@angular/localize/init"
+            ],
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              "src/assets/images/telekom_icon.ico",
+              "src/assets",
+              "src/keycloak-error.html",
+              "src/manuals/",
+              "src/support/",
+              {
+                "glob": "**/*.json",
+                "input": "node_modules/@portal-mfe/data-table/i18n",
+                "output": "assets/i18n/data-table"
+              }
+            ],
+            "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "src/assets/css/bootstrap-icons.css",
+              "./node_modules/@angular/cdk/overlay-prebuilt.css",
+              "./node_modules/@perfectmemory/ngx-contextmenu/src/assets/stylesheets/base.scss",
+              "./node_modules/leaflet/dist/leaflet.css",
+              "./node_modules/vis-network/styles/vis-network.min.css",
+              "./node_modules/@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css",
+              "./node_modules/@ng-select/ng-select/themes/default.theme.css",
+              "./node_modules/@portal-mfe/tnap-ui-kit/tokens/index.css",
+                "node_modules/codemirror/lib/codemirror.css",
+              {
+                "input": "src/assets/css/onap-styles.css",
+                "bundleName": "onap-styles",
+                "inject": true
+              },
+              {
+                "input": "src/assets/css/telekom-styles.css",
+                "bundleName": "telekom-styles",
+                "inject": true
+              },
+              {
+                "input": "src/styles.css",
+                "bundleName": "custom-styles",
+                "inject": true
+              }
+            ],
+           "scripts": [
+              "node_modules/codemirror/lib/codemirror.js",
+              "node_modules/codemirror/mode/javascript/javascript.js",
+              "node_modules/codemirror/mode/go/go.js"
+            ],
+            "extractLicenses": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true,
+            "browser": "src/main.ts"
+          },
+          "configurations": {
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ]
+            },
+            "e2e": {
+              "optimization": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.e2e.ts"
+                }
+              ]
+            },
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5.50mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "buildTarget": "frontend:build"
+          },
+          "configurations": {
+            "development": {
+              "open": true,
+              "host": "0.0.0.0",
+              "port": 80,
+              "proxyConfig": "staging.proxy.config.json",
+              "buildTarget": "frontend:build:development"
+            },
+            "e2e": {
+              "open": true,
+              "host": "0.0.0.0",
+              "port": 4200,
+              "proxyConfig": "e2e.proxy.config.json",
+              "buildTarget": "frontend:build:e2e"
+            },
+            "production": {
+              "buildTarget": "frontend:build:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "frontend:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "codeCoverage": true,
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "tsconfig.spec.json",
+            "karmaConfig": "karma.conf.js",
+            "assets": [
+              "src/assets/images/telekom_icon.ico",
+              "src/assets",
+              "src/keycloak-error.html"
+            ],
+            "styles": [
+              "src/styles.css"
+            ],
+            "scripts": [],
+            "browsers": "FirefoxHeadless"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html",
+              "e2e/**/*.ts"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "cache": {
+      "enabled": true,
+      "path": ".cache",
+      "environment": "all"
+    },
+    "analytics": "8f37c777-0688-43ed-a5a5-b315e820eff9",
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
+  }
+}

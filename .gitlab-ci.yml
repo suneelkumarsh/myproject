@@ -1,0 +1,255 @@
+include:
+  - project: 'tnap/development/pipelines/docker-build'
+    ref: fix/TNAP-14715_image_build_karniko
+    file: 'functions.yml'
+  - project: 'tnap/development/ci-functions/malerin'
+    ref: v1
+    file:
+      - 'ci/deployment.yml'
+      - 'ci/sonarqube.yml'
+  - template: Security/Container-Scanning.gitlab-ci.yml
+  - template: Jobs/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+variables:
+  GITLAB_ADVANCED_SAST_ENABLED: "true"
+  # The runner has 12 cores, but the analyzer logs "No Memory limit is detected" and so
+  # caps itself at 3 "unverified" cores. It sizes for 4 GB per worker, so this raises the
+  # cap only to 6 rather than 12 — the fleet hosts are shared with other jobs and their
+  # real memory headroom is not visible from here. Yields 5 parallel workers, not 6: the
+  # analyzer keeps one core for the main process. Raise further once memory is verified.
+  MAX_UNVERIFIED_CORES: "6"
+  ART_HOST: '$ARTIFACTORY_HOST/tnap-docker'
+  VERSION: 0.9.0-$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID-SNAPSHOT
+  FRONTEND_IMAGE_NAME: portal-ui
+  OPENAPI_GENERATOR_USER: '$ART_USERNAME'
+  OPENAPI_GENERATOR_TOKEN: '$ART_PASSWORD'
+  OPENAPI_GENERATOR_JAR_BASE_URL: 'https://artifactory.devops.telekom.de/artifactory/maven-central-cache/org/openapitools/openapi-generator-cli'
+
+default:
+  tags:
+    - ta5_tnaplab
+
+image: $ART_HOST/build-base:0.9.0
+
+.cache: &cache
+  key: $CI_COMMIT_REF_SLUG
+  paths:
+    - node_modules/
+
+.install_deps: &install_deps
+  before_script:
+    - export OPENAPI_GENERATOR_VERSION=$(node -p "require('./openapitools.json')['generator-cli'].version")
+    - export OPENAPI_GENERATOR_JAR_URL="${OPENAPI_GENERATOR_JAR_BASE_URL}/${OPENAPI_GENERATOR_VERSION}/openapi-generator-cli-${OPENAPI_GENERATOR_VERSION}.jar"
+    - npm config set registry https://artifactory.devops.telekom.de/artifactory/api/npm/registry.npmjs.org/
+    - npm set //artifactory.devops.telekom.de/artifactory/api/npm/registry.npmjs.org/:_auth $ARTIFACTORY_B64_TOKEN
+    - npm install --legacy-peer-deps
+
+stages:
+  - test
+  - quality
+  - build
+  - build_image
+  - publish
+  - scan
+  - deploy
+
+test:
+  stage: test
+  <<: *install_deps
+  script:
+    - npm run test
+  artifacts:
+    paths:
+      - coverage/lcov.info
+    expire_in: 1 week
+  # The runner fleet has no shared cache server ("No URL provided" in the job log), so a
+  # cache is only ever re-read when a later job happens to land on the same host. Kept as
+  # pull-push here rather than in a dedicated warm-up job: this is the earliest job, so it
+  # seeds the host caches without any job waiting on it.
+  cache:
+    <<: *cache
+    policy: pull-push
+  timeout: 2 hours
+  retry: 2
+
+e2e:
+  stage: test
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+    DOCKER_HOST: tcp://docker:2375
+    # compose brings Keycloak up inside the dind service, not on this job's loopback
+    KEYCLOAK_HOST: docker
+  services:
+    - name: 'dockerhub.devops.telekom.de/docker:27.3.1-dind'
+      command: ['--tls=false', '--registry-mirror=https://dockerhub.devops.telekom.de', '--storage-driver=overlay2', '--mtu=1450']
+      alias: docker
+  <<: *install_deps
+  script:
+    - echo "$ART_PASSWORD" | docker login -u $ART_USERNAME --password-stdin artifactory.devops.telekom.de
+    # firefox for the test projects, chromium for the `setup` project (it declares no
+    # `use:`, so it takes the config default). Naming them skips the webkit download.
+    - npx playwright install --with-deps firefox chromium
+    - sed -i 's/127.0.0.1/docker/g' e2e.proxy.config.json
+    - npm run e2e
+  after_script:
+    - echo "https://tnap.pages.devops.telekom.de/-/development/apps/portal/portal-ui/portal-ui/-/jobs/$CI_JOB_ID/artifacts/playwright-report/index.html"
+  tags:
+    - aws_run_sysbox_l
+  artifacts:
+    when: always
+    paths:
+      - playwright-report
+    expire_in: 14 days
+
+sonarqube:
+  extends: .sonarqube:generic
+  needs:
+    - job: test
+      artifacts: true
+    - job: prepare-quality-gate-script
+      artifacts: true
+  variables:
+    QUALITYGATE_WAIT: true
+    SONAR_EXTRA_OPTS: >
+      -Dsonar.sources=./src
+      -Dsonar.javascript.lcov.reportPaths=$CI_PROJECT_DIR/coverage/lcov.info
+  cache:
+    <<: *cache
+    policy: pull
+  dependencies:
+    - test
+    - prepare-quality-gate-script
+  allow_failure: true
+
+lint:
+  stage: quality
+  <<: *install_deps
+  script:
+    - npm run lint
+  cache:
+    <<: *cache
+    policy: pull
+  # nothing to wait for — installs its own deps, so it starts with the test stage
+  # instead of after it.
+  needs: []
+
+license_header_check:
+  stage: quality
+  script:
+    - npx license-check-and-add check -f license-check-and-add-config.json -r $(date +%Y)
+  # npx fetches its own tool and the check only reads tracked sources, so this needs
+  # neither node_modules nor any earlier job.
+  needs: []
+
+license_check:
+  stage: quality
+  script:
+    - npx license-checker --failOn 'GPL-3.0-or-later'
+  needs: []
+
+license_info:
+  stage: quality
+  script:
+    - cd $CI_PROJECT_DIR
+    - npx license-report --output=html > ./portal_ui_licences.html --config ./license-report-config.json
+  artifacts:
+    name: "license-info_$CI_COMMIT_TAG"
+    paths:
+      - "portal_ui_licences.html"
+    expire_in: 6 mos
+  only:
+    - master
+    - tags
+
+build_app:
+  stage: build
+  <<: *install_deps
+  script:
+    - export VERSION=$(cat version)
+    - export RELEASE="^[0-9]+\.[0-9]+\.[0-9]+$"
+    - export RELEASE_CANDIDATE="^[0-9]+\.[0-9]+\.[0-9]+(rc|-rc)$"
+    - |-
+      if [[ $CI_COMMIT_REF_NAME == "master" || $CI_COMMIT_TAG =~ $RELEASE ]]; then
+        export REPLACEMENT_PATTERN="s/VERSIONPLACEHOLDER/$VERSION/g"
+      elif [[ $CI_COMMIT_TAG =~ $RELEASE_CANDIDATE ]]; then
+        export REPLACEMENT_PATTERN="s/VERSIONPLACEHOLDER/$VERSION-rc/g"
+      else
+        export REPLACEMENT_PATTERN="s/VERSIONPLACEHOLDER/dev-$CI_COMMIT_SHORT_SHA/g"
+      fi
+      sed -i -e $REPLACEMENT_PATTERN src/keycloak-error.html src/assets/version.json
+    - echo $REPLACEMENT_PATTERN
+    - cat src/assets/version.json
+    - cat src/keycloak-error.html
+    - npm run build -- --configuration production
+  artifacts:
+    name: 'dist-$CI_COMMIT_SHA'
+    paths:
+      - dist/frontend
+      - version
+    expire_in: 30 mins
+  # Starts immediately and installs its own deps; it never got a cache hit from the old
+  # warm-up job anyway, since that job runs on a different host of the runner fleet.
+  needs: []
+  cache:
+    <<: *cache
+    policy: pull
+
+build_image:
+  stage: build_image
+  extends: .build_image
+  dependencies:
+    - build_app
+  needs:
+    - build_app
+
+publish_image_dev:
+  stage: publish
+  extends: .publish_image
+  before_script:
+    - export tag=$CI_COMMIT_SHORT_SHA
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+  dependencies:
+    - build_image
+
+publish_image_rel:
+  stage: publish
+  extends: .publish_image_release
+  before_script:
+    - export tag=$CI_COMMIT_TAG
+  rules:
+    # run for tags matching v1.0.0
+    - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+.*$/'
+  dependencies:
+    - build_image
+
+container_scanning:
+  stage: scan
+  script:
+    - export TAG=$(cat version)-$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA
+    - echo "scanning $TAG"
+    # reused from Container-Scanning.gitlab-ci.yml not to overwrite
+    - gtcs scan
+  variables:
+    SECURE_LOG_LEVEL: debug
+    CS_IMAGE: artifactory.devops.telekom.de/tnap-docker/portal-ui:$TAG
+    CS_REGISTRY_USER: $ART_USERNAME
+    CS_REGISTRY_PASSWORD: $ART_PASSWORD
+    CS_DOCKERFILE_PATH: ${CI_PROJECT_DIR}/Dockerfile
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: never
+    - if: '$CI_COMMIT_REF_NAME == "main"'
+  dependencies:
+    - build_app
+
+deploy:
+  stage: deploy
+  extends: .argo_app_config_custom_deploy
+  variables:
+    ARGO_PATH: app-config/apps/tnap-portal
+    PATTERN: .portal-ui.image.tag
+  only:
+    - main

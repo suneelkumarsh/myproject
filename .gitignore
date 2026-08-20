@@ -1,0 +1,73 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+/dist
+/tmp
+/out-tsc
+/reports
+# Only exists if Bazel was run
+/bazel-out
+# Exists if npm audit was run
+/target
+
+# dependencies
+/node_modules
+node
+#package-lock.json
+/openapi/input/api.yaml
+
+# profiling files
+chrome-profiler-events*.json
+speed-measure-plugin*.json
+
+# IDEs and editors
+.c9/
+.classpath
+/.idea
+*.launch
+.project
+.settings/
+*.sublime-workspace
+.vscode
+/.nx
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+/.cache
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Open API
+/openapi/output
+/openapi/openapi-generator-cli-*.jar
+/.angular
+.cache
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/e2e/wiremock/input
+
+# Github Copilot instructions
+/.github/

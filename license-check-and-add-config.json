@@ -1,0 +1,43 @@
+{
+  "ignore": [
+    "openapi",
+    "src/assets",
+    "server",
+    "Dockerfile",
+    "*.yml",
+    "*.md",
+    "**/*.conf.js",
+    ".*",
+    "*.sh",
+    "*.properties",
+    "**/*.puml",
+    "doc/*",
+    "version",
+    ".husky/*",
+    "*.mjs",
+    "coverage/*",
+    "playwright-report/*",
+    "playwright.config.ts",
+    "e2e/compose/**",
+    "e2e/scripts/**"
+  ],
+  "license": "LICENSE_HEADER",
+  "licenseFormats": {
+    "js|ts|css": {
+      "prepend": "/*",
+      "append": " */",
+      "eachLine": {
+        "prepend": " * "
+      }
+    },
+    "html": {
+            "prepend": "<!--",
+            "append": "  -->",
+            "eachLine": {
+                "prepend": "  ~ "
+            }
+        }
+    },
+    "trailingWhitespace": "TRIM",
+    "regexIdentifier": "##"
+}

@@ -1,0 +1,36 @@
+{
+  "/api": {
+    "target": "https://portal-do1-dev.tnaplab.telekom.de/api",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": ""
+    }
+  },
+  "/mock-api": {
+    "target": "https://portal-do1-dev.tnaplab.telekom.de/mock-api",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/mock-api": ""
+    }
+  },
+  "/realms": {
+    "target": "https://keycloak-do1-dev.tnaplab.telekom.de",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/onap_logging": {
+    "target": "https://portal-do1-dev.tnaplab.telekom.de/onap_logging",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/tracing": {
+    "target": "https://portal-do1-dev.tnaplab.telekom.de",
+    "pathRewrite": {
+      "^/tracing": ""
+    },
+    "secure": false,
+    "changeOrigin": true
+  }
+}

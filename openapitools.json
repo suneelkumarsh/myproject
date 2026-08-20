@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "6.6.0",
+    "generators": {
+      "v3.0": {
+        "generatorName": "typescript-angular",
+        "inputSpec": "openapi/input/api.yaml",
+        "output": "openapi/output",
+        "additionalProperties": {
+          "ngVersion": "19.2.3",
+          "modelFileSuffix": ".model",
+          "fileNaming": "camelCase",
+          "enumPropertyNaming": "UPPERCASE"
+        }
+      }
+    }
+  }
+}
