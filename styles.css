@@ -1,0 +1,1354 @@
+/*
+ * Copyright (c) 2022. Deutsche Telekom AG
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* https://www.w3schools.com/css/css3_variables.asp */
+:root {
+  /* Height of the app header, see `.wrapper` in app.component.css. */
+  --header-height: 55px;
+  --alert-transparency: 0.9;
+  --light-gray: #f5f5f5;
+  --dark-gray: #5a5858;
+  --active-gray: #d9d9d9;
+  --black: #000;
+  --white: #fff;
+  --danger: #d90000;
+  --secondary: #ededed;
+  --major: #facbcb;
+  --minor: #fecb00;
+  --intense-blue: #00a0de;
+  --warning: #63b3fb;
+  --light-green: #d5e7d4;
+  --interactive-gray: #71717a;
+  --disabled-control-bg: #d2d2d5;
+  --success-green: #198754;
+  --warning-yellow: #ffc107;
+  --failure-red: #dc3545;
+  --decorative-gray: #c6c6c8;
+  /* Typography color tokens */
+  --Body-Text-Body-Color: #000;
+  --Text-Additional: rgba(0, 0, 0, 0.65);
+  /*links*/
+  --default-link: #2238df;
+  --default-link-hover: #0819bd;
+  --default-link-pressed: #000d99;
+  --default-link-visited: #6c3bdb; /*works for <a> only, not <button>*/
+  --alert-info-text: #052c65;
+  --alert-info-border: #9ec5fe;
+  --alert-info-background: #cfe2ff;
+  --alert-success-text: #0a3622;
+  --alert-success-border: #a3cfbb;
+  --alert-success-background: #d1e7dd;
+  --alert-warning-text: #664d03;
+  --alert-warning-border: #ffe69c;
+  --alert-warning-background: #fff3cd;
+}
+
+/* Shared look of a tnap-data-table inside a map side panel. Global because the
+   rules cross component boundaries into the kit's table markup; column widths
+   and row interaction stay with the owning component. */
+.map-panel-table table {
+  table-layout: fixed;
+  margin-bottom: 0;
+}
+
+/* Table row cells per Figma (node 15:14680): 48px min height, 14px medium */
+.map-panel-table tbody td {
+  height: 48px;
+  color: var(--bs-black, #000);
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+/* Typography utilities – Body/M (16px Medium, 140% line-height, 0.5px spacing) */
+.text-body-m {
+  color: var(--Body-Text-Body-Color, #000);
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+}
+
+.text-additional-m {
+  color: var(--Text-Additional, rgba(0, 0, 0, 0.65));
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 140%;
+  letter-spacing: 0.5px;
+}
+
+/* Typography utility – Heading/H5 (20px Bold, 120% line-height) */
+.text-heading-h5 {
+  color: var(--Body-Text-Body-Color, #000);
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+/* Icon-only button in map panel headers (Figma node 55:9700): transparent until
+   hover. Global because three panels share it. The design's 9px side padding
+   would make the box 36x30, so the hit area is squared instead.
+   telekom-styles.css overrides Bootstrap's padding and radius variables with
+   literal values, so those two must be set directly; the colours still work
+   through the variables. */
+.map-pane-icon-btn {
+  --bs-btn-color: var(--Body-Text-Body-Color, #000);
+  --bs-btn-hover-color: var(--Body-Text-Body-Color, #000);
+  --bs-btn-hover-bg: var(--secondary, #ededed);
+  --bs-btn-active-color: var(--Body-Text-Body-Color, #000);
+  --bs-btn-active-bg: var(--secondary, #ededed);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+/* bi-x keeps the design's thin stroke but draws smaller than its 16px box, so
+   the glyph is enlarged inside a fixed box. */
+.map-pane-icon-btn .bi {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.map-pane-icon-btn .bi-x {
+  font-size: 1.25rem;
+}
+
+/* ########################################
+ *           Colors
+ * ########################################
+ */
+
+.blue {
+  color: var(--blue);
+}
+
+.orange {
+  color: #ffa500;
+}
+
+.red {
+  color: #ff0000;
+}
+
+.green {
+  color: #008000;
+}
+
+.dark-gray {
+  color: var(--dark-gray);
+}
+
+.black {
+  color: var(--black);
+}
+
+.max-w-100px {
+  max-width: 100px;
+}
+
+.max-w-120px {
+  max-width: 120px;
+}
+
+.right-10 {
+  right: 10px;
+}
+
+.opacity-1 {
+  opacity: 1 !important;
+}
+
+.alert {
+  z-index: 1;
+  border-radius: 0.375rem !important;
+}
+
+.alert-primary {
+  background-color: #cce5ff !important;
+}
+
+.alert-secondary {
+  background-color: #e2e3e5 !important;
+}
+
+.alert-success {
+  background-color: var(--alert-success-background) !important;
+  border: 1px solid var(--alert-success-border) !important;
+  color: var(--alert-success-text) !important;
+}
+
+.alert-info {
+  background-color: var(--alert-info-background) !important;
+  border: 1px solid var(--alert-info-border) !important;
+  color: var(--alert-info-text) !important;
+}
+
+.alert-warning {
+  background-color: var(--alert-warning-background) !important;
+  border: 1px solid var(--alert-warning-border) !important;
+  color: var(--alert-warning-text) !important;
+}
+
+.text-success {
+  color: var(--success-green) !important;
+}
+
+.text-warning {
+  color: var(--alert-warning-text) !important;
+}
+
+.alert-danger {
+  color: var(--red) !important;
+  background-color: #f8d7da !important;
+}
+
+.alert-light {
+  background-color: #fefefe !important;
+}
+
+.alert-dark {
+  background-color: #d6d8d9 !important;
+}
+
+.navbar-collapse.in {
+  display: block !important;
+}
+
+.btn {
+  max-height: 40px;
+}
+
+.max-w-fit-content {
+  max-width: fit-content !important;
+}
+
+.btn-delete-bg {
+  background-position: center;
+  background-image: url('assets/images/icons/delete-icon.svg');
+}
+
+.breadcrumb-item a {
+  color: var(--blue) !important;
+}
+
+.bg-lightGray {
+  background-color: var(--light-gray) !important;
+}
+
+.bg-gray {
+  background-color: var(--gray) !important;
+}
+
+.bg-major {
+  background-color: var(--major) !important;
+}
+
+.bg-warning {
+  background-color: var(--light-blue) !important;
+}
+
+/* Make pagination responsive: https://github.com/twbs/bootstrap/issues/23504#issuecomment-592757850 */
+ul.pagination {
+  margin-bottom: 0;
+  flex-wrap: wrap;
+}
+
+/* Allow other elements to be in line with the pagination */
+ngb-pagination {
+  display: inline-block;
+}
+
+.form-control:disabled,
+.form-control[readonly],
+option:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  background-color: #d2d2d5 !important;
+  opacity: 1 !important;
+  border: none !important;
+}
+
+/*
+  Red asterisk that is not visible to screen readers
+  https://stackoverflow.com/questions/26634156/can-i-prevent-after-pseudo-element-from-being-read-by-screen-readers#26634352
+*/
+.required:after {
+  content: '';
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  background-image: url(src/assets/images/icons/Asterisk.svg);
+  background-size: 0.5em 0.5em;
+  vertical-align: top;
+  margin-left: 0.15em;
+  margin-top: 0.1em;
+}
+
+.breadcrumb-item::before {
+  margin-top: 4px;
+}
+
+.uuid-cell {
+  width: 350px;
+  min-width: 350px;
+  max-width: 350px;
+}
+
+.btn-invisible {
+  background-color: initial;
+  border: none;
+}
+
+.dropdown-toggle::after {
+  height: 6px !important;
+}
+
+#deployment-summary-accordion > .card {
+  border-radius: 0.25rem;
+}
+
+/* Override the (overly large) padding of the accordion header element */
+#deployment-summary-accordion > .card > .card-header {
+  padding-left: 17px;
+  padding-right: 17px;
+}
+
+/* add a scrollbar to the content area of the accordion */
+#deployment-summary-accordion > .card > div[id^='panel-'] {
+  max-height: 50vh;
+  overflow: auto;
+}
+
+/* telekom-styles is removing the bottom border on this element otherwise*/
+.accordion .card:first-of-type {
+  border: 1px solid #b2b2b2 !important;
+}
+
+/* Accessibility override – 9.1.4.11 */
+.form-control {
+  border: 1px solid #71717a !important;
+}
+
+/* Accessibility override – 9.1.4.11 */
+.btn-outline-secondary:focus-visible {
+  background-color: var(--dark-gray) !important;
+  color: var(--white) !important;
+  border-color: var(--light-gray) !important;
+}
+
+/* Accessibility override – 9.1.4.11 */
+.form-check-input {
+  --bs-border-color: #71717a;
+}
+
+.w-20px {
+  width: 20px !important;
+}
+
+/* override the telekom-styles behaviour: Pagination is too small */
+.pagination-sm .page-link {
+  line-height: 1.8 !important;
+}
+
+/* App-wide focus indicator (WCAG 2.4.7 / 2.4.13).
+   :focus-visible, NOT :focus — :focus also matches mouse clicks, which left a ring
+   on every clicked element until the next click. The two-tone light-over-dark ring
+   stays visible on both light and dark backgrounds; no `border`, because a border
+   participates in layout and shifted content on focus. */
+*:focus-visible {
+  outline: 2px #f9f9f9 solid !important;
+  outline-offset: 0 !important;
+  box-shadow: 0 0 0 4px #262626 !important;
+  border-radius: 2px;
+}
+
+.border-blue {
+  border-color: var(--light-blue) !important;
+}
+
+.ngx-charts-outer {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.outline-blue {
+  border: 1px solid var(--light-blue) !important;
+  border-radius: 0.25rem;
+}
+
+.outline-grey {
+  border-color: 1px solid var(--secondary);
+  border-radius: 0.25rem;
+}
+
+.border-radius-top-none {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
+.accordion .card:last-of-type {
+  border-top-left-radius: 0.25rem !important;
+  border-top-right-radius: 0.25rem !important;
+}
+
+.text-align-start {
+  text-align: start;
+}
+
+.row-active {
+  border-radius: 0.25rem;
+}
+
+.row-active,
+.row-active td {
+  background-color: var(--active-gray) !important;
+  border-radius: 0 !important;
+}
+
+.accordion > .card > .card-header {
+  padding-left: 0 !important;
+}
+
+.accordion-body > .card-header {
+  padding: 0 !important;
+  background-color: var(--white) !important;
+  border: none !important;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.draggable {
+  cursor: grab;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+/* used for perceivedSeverity: major in the alarm list */
+.table-major {
+  background-color: var(--major) !important;
+}
+
+/* for ng-bootstraps nav tabs in the alarm details. Hovering over elements looks weird otherwise */
+.no-border-hover:hover > a {
+  border-bottom: none !important;
+}
+
+/* Prevent [sort icons] from breaking into a new line in table headers */
+th {
+  white-space: nowrap;
+}
+
+/* Override calc() to achieve same height of inputs and buttons */
+.form-control {
+  height: auto !important;
+}
+
+/*BADGES*/
+.active-badge {
+  box-shadow: 0 0 2pt 2pt var(--light-blue);
+}
+
+.badge {
+  font-size: 100% !important;
+  --bs-badge-font-weight: 400;
+}
+
+.badge-major {
+  color: var(--dark);
+  background-color: var(--major);
+}
+
+.badge-success {
+  background-color: var(--success-green) !important;
+  color: #fff !important;
+}
+
+.badge-danger {
+  background-color: var(--failure-red) !important;
+}
+
+/* Context menu overrides */
+.ngx-contextmenu {
+  box-shadow: 0 0 17px 0 rgba(0, 0, 0, 0.59);
+}
+
+.ngx-contextmenu > .dropdown-menu > li > a:hover {
+  text-decoration: none !important;
+}
+
+.border-radius {
+  border-radius: 0.25rem !important;
+}
+
+/* We will use boostrap default icon
+.form-control.is-invalid,
+.was-validated .form-control:valid {
+  background-image: url('assets/images/icons/triangular-warning-sign.svg') !important;
+  background-position: right calc(1.75em + 0.1875rem) center !important;
+}
+*/
+
+.no-border {
+  border: none !important;
+}
+
+.border-gray {
+  border: 1px solid var(--gray);
+}
+
+.btn-outline-secondary {
+  color: var(--dark-gray) !important;
+  border-color: var(--gray) !important;
+}
+
+.node-content-wrapper,
+.tree-children {
+  position: relative;
+}
+
+.node-content-wrapper::before,
+.tree-children::after {
+  content: '';
+  position: absolute;
+}
+
+.node-content-wrapper::before {
+  height: 28px;
+  top: -13px;
+  width: 20px;
+  left: -26px;
+}
+
+.tree-node-level-1
+  > tree-node-wrapper
+  > .node-wrapper
+  > .node-content-wrapper::before {
+  display: none;
+}
+
+.tree-node-leaf > .node-wrapper > .node-content-wrapper::before {
+  width: 25px;
+}
+
+.tree-children::after {
+  height: 100%;
+  top: -15px;
+  left: 6px;
+}
+
+.toggle-children-placeholder {
+  width: 13px !important;
+}
+
+tree-node:last-child > .tree-node > .tree-children::after {
+  border-left: none;
+}
+
+.toggle-children-wrapper {
+  padding: 2px 3px 5px 0;
+}
+
+.toggle-children {
+  z-index: 1;
+  width: 11px !important;
+  height: 11px !important;
+}
+
+.toggle-children-wrapper-expanded .toggle-children {
+  top: 1px;
+  left: 1px;
+}
+
+/* TreeView pane */
+div.pane-site-buttons ul {
+  list-style: none;
+  margin-bottom: 0 !important;
+  font-size: 24px;
+}
+
+.pane-button,
+div.pane-site-buttons ul button,
+div.pane-actions button {
+  padding: 5px !important;
+  line-height: 1.45 !important;
+}
+
+.attribute-pane-title-full-width {
+  max-width: 100% !important;
+  line-height: 1 !important;
+}
+
+.select-detail-pane-shortcut:focus {
+  box-shadow: 0 0 10px lightblue;
+  border-color: lightblue;
+  border-width: 2px;
+}
+
+/* ------------- */
+
+.mr-15-px {
+  margin-right: 15px;
+}
+
+.ml-8-px {
+  margin-left: 8px;
+}
+
+.bg-color-blue {
+  background-color: var(--light-blue);
+}
+
+/* styling for switch that we are using in attribute pane for showing and hiding the attributes */
+/* ------------------------------------------------------------------------------------- */
+.attribute-pane-switch {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+
+.switch-filled {
+  cursor: pointer;
+  text-align: -9999px;
+  width: 40px;
+  height: 20px;
+  background: var(--active-gray);
+  display: block;
+  border-radius: 100px;
+  position: relative;
+  border: 1px solid var(--primary);
+}
+
+.switch-filled::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 1px;
+  width: 18px;
+  height: 18px;
+  background: var(--primary);
+  border-radius: 90px;
+  transition: 0.3s;
+}
+
+#switch:checked + .switch-filled {
+  background: var(--primary);
+}
+
+/*POC*/
+.slice-selection-button {
+  border-radius: 6px !important;
+  padding: 8px 0 !important;
+  padding-left: 8px !important;
+}
+
+#switch:checked + .switch-filled:after {
+  right: calc(18px - 1px);
+  transform: translateX(100%);
+  background: var(--active-gray);
+}
+
+.switch-filled:active:after {
+  width: 18px;
+}
+
+.text-for-switch {
+  font-size: 11px;
+}
+
+/* ------------------------------------------------------------------------------------- */
+
+.toggle-children-wrapper-collapsed .toggle-children,
+.toggle-children-wrapper-expanded .toggle-children {
+  top: 2.4px;
+}
+
+.node-custom-content-wrapper {
+  padding: 2px 5px !important;
+}
+
+.node-content-wrapper {
+  padding: 0 !important;
+  border: 1px solid rgba(0, 0, 0, 0);
+}
+
+/* Display definition lists in a tabular style */
+/* https://stackoverflow.com/questions/1687733/what-html-markups-to-use-for-displaying-label-value-data#1687759 */
+dt {
+  float: left;
+  clear: left;
+  width: 6em;
+  font-weight: bold;
+}
+
+.ml-2px {
+  margin-left: 2px;
+}
+
+.overflow-y-scroll {
+  overflow-y: scroll;
+}
+
+.alarm-color-critical-outline {
+  color: var(--white);
+  background-color: var(--danger) !important;
+}
+
+.alarm-color-cleared-outline {
+  color: var(--black);
+  border: 1px solid var(--black);
+}
+
+.alarm-color-major-outline {
+  border: 1px solid var(--major);
+  color: var(--major);
+}
+
+.alarm-color-minor-outline {
+  border: 1px solid var(--minor);
+  color: var(--minor);
+}
+
+.alarm-color-warning-outline {
+  color: var(--intense-blue);
+  border: 1px solid var(--intense-blue);
+}
+
+.alarm-color-indeterminate-outline {
+  border: 1px solid var(--secondary);
+  color: var(--secondary);
+}
+
+.leaflet-div-icon-hide {
+  background: none;
+  border: none;
+}
+
+.alarm-severity-counter {
+  background-color: white;
+  border-radius: 4px;
+  margin: 0 2px;
+  padding: 0 0.25rem !important;
+}
+
+.bc-icon {
+  color: var(--primary);
+}
+
+.hover-bg-gray:hover {
+  background-color: #ededed;
+  width: 100% !important;
+}
+
+.selected-bg-gray td,
+tr.hover-bg-gray:hover td {
+  background-color: #d9d9d9;
+}
+
+.pulse {
+  animation: pulse 2s ease-in infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0.8;
+  }
+}
+
+tree-viewport {
+  overflow-x: auto !important;
+  display: flex !important;
+}
+
+.node-content-wrapper-focused,
+.node-content-wrapper-focused:hover {
+  border: 1px solid var(--primary);
+}
+
+.backdropClass {
+  z-index: 1050 !important;
+}
+
+.table > :not(:first-child) {
+  border-top: none !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 998 !important;
+}
+
+/*arrows for input[type=number] still visible*/
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+/*CELL SITES*/
+.lte svg path {
+  border: none;
+  fill: blue;
+  opacity: 0.5;
+}
+
+.fiveg svg path {
+  border: none;
+  fill: orange;
+  opacity: 0.8;
+}
+
+.gsm svg path {
+  border: none;
+  fill: green;
+  opacity: 0.5;
+}
+
+div.site-icon {
+  z-index: 10000 !important;
+}
+
+ngb-typeahead-window {
+  max-height: 500px;
+  overflow-y: scroll;
+}
+
+.color-magenta {
+  color: var(--primary);
+}
+
+.leaflet-control-layers-overlays > label:nth-child(4),
+.leaflet-control-layers-overlays > label:nth-child(6) {
+  border-bottom: 1px solid lightgray;
+  padding-bottom: 5px;
+}
+
+.btn-light-gray {
+  background-color: lightgray;
+}
+
+.btn-dark-gray {
+  background-color: var(--dark-gray);
+}
+
+.btn-danger-deploy {
+  color: #fff;
+  background-color: #be0062;
+  border-color: #90004a;
+}
+
+.btn-danger-deploy:hover {
+  color: #fff;
+  background-color: #be0062;
+  border-color: #90004a;
+}
+
+.tile-height {
+  height: 408.867px;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  text-decoration: none;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+.table th {
+  font-weight: 600 !important;
+}
+
+.w-95 {
+  width: 95% !important;
+}
+
+.highlighted-text {
+  background-color: yellow;
+}
+
+.highlight {
+  background: linear-gradient(
+    110deg,
+    var(--ng-tree-highlight-bg, #ffff00) 55%,
+    #fff 70%,
+    var(--ng-tree-highlight-bg, #ffff00) 85%
+  ) !important;
+  color: black !important;
+}
+
+.min-h-79vh {
+  min-height: 79vh;
+}
+
+.min-w-200px {
+  min-width: 200px;
+}
+
+.min-w-300px {
+  min-width: 300px;
+}
+
+.min-w-500px {
+  min-width: 500px;
+}
+
+.max-w-400px {
+  max-width: 400px;
+}
+
+.pane-title {
+  color: var(--primary);
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap !important;
+  display: inline-block;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.reset-button-styles {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+}
+
+.tab-pane {
+  width: 100% !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--magenta);
+  border-color: var(--magenta);
+}
+
+.accordion-button::after {
+  position: absolute;
+  left: 0;
+}
+
+.accordion-button:not(.collapsed) {
+  color: inherit;
+  background-color: inherit;
+  box-shadow: inherit;
+}
+
+.background-active-green {
+  background-color: var(--light-green) !important;
+}
+
+.background-active-green > td {
+  background-color: transparent;
+}
+
+.link-like {
+  color: #00739f !important;
+}
+
+.link-like:hover {
+  text-decoration: underline !important;
+}
+
+.cdk-overlay-container-blur {
+  z-index: 99999 !important;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+.detail-label {
+  display: inline-block;
+  color: #374151; /* WCAG contrast fix */
+  font-size: 15px;
+  margin-top: 3px;
+}
+
+/* Interactive elements(buttons/links/custom widgets...) must have clickable area of size 24x24 according to wcag level AA, see
+https://www.w3.org/TR/WCAG22/#target-size-minimum */
+.hit-24 {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  line-height: 24px;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.grey-redirect-button {
+  background-color: #6c757d !important;
+  color: #fff !important;
+  border-radius: var(--bs-border-radius-lg) !important;
+  font-size: 1em !important;
+}
+
+.form-select {
+  border: 1px solid var(--interactive-gray);
+}
+
+.see-more-button {
+  all: unset; /* removing all browser + bootstrap styles */
+  cursor: pointer;
+  color: var(--default-link);
+  text-decoration: underline;
+  padding: 4px 8px; /*total 24px to comply with WCAG 2.5.5 (Target Size)*/
+  line-height: 1.2;
+}
+
+.see-more-button:hover {
+  color: var(--default-link-hover);
+}
+
+.see-more-button:active {
+  color: var(--default-link-pressed);
+}
+
+/* == Unified split-grid layout == */
+.split-grid {
+  display: grid;
+  height: 90vh;
+  min-width: 0;
+}
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pane-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  height: 100%;
+  padding-top: 1rem;
+}
+
+app-resizer {
+  height: 100%;
+}
+
+.detail-fit {
+  height: 100%; /* filling pane-scroll box */
+  min-height: 0;
+  overflow: auto; /* child content scrolls here instead of stretching the pane */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/*placed in style.css to avoid ::ng-deep*/
+.tree-wrapper-override .tree-wrapper {
+  height: 85vh !important;
+}
+
+h1 {
+  font-size: 1.5rem !important;
+  font-weight: 400 !important;
+}
+h2 {
+  font-size: 1.3rem !important;
+  font-weight: 400 !important;
+}
+h3 {
+  font-size: 1.2rem !important;
+  font-weight: 400 !important;
+}
+h4 {
+  font-size: 1.1rem !important;
+  font-weight: 400 !important;
+}
+
+@media (forced-colors: active) {
+  img[src*='assets/images/icons'] {
+    filter: invert(1) grayscale(1) contrast(200%) !important;
+    forced-color-adjust: none;
+  }
+
+  img[src$='grid.svg'],
+  img[src$='people.svg'],
+  img[src$='en.svg'],
+  img[src$='de.svg'] {
+    filter: none !important;
+    forced-color-adjust: auto; /* Let OS handle these */
+  }
+
+  .current-page {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+    color: HighlightText !important;
+    border: 2px solid HighlightText !important;
+  }
+
+  li .nav-link.active {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+    color: HighlightText !important;
+  }
+
+  select,
+  select option {
+    forced-color-adjust: auto;
+    background-color: Canvas !important;
+    color: CanvasText !important;
+    border: 2px solid CanvasText !important;
+  }
+
+  select:focus {
+    outline: 3px solid CanvasText !important;
+    outline-offset: 2px;
+  }
+
+  select option:checked,
+  select option:hover {
+    background-color: Highlight !important;
+    color: HighlightText !important;
+    border: 2px solid HighlightText !important;
+  }
+}
+
+ngx-codemirror,
+.CodeMirror-scroll,
+.CodeMirror {
+  height: 100% !important;
+  display: block;
+}
+
+.custom-option {
+  color: blue;
+  font-weight: bold;
+}
+
+::ng-deep .CodeMirror pre.CodeMirror-line {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+::ng-deep .CodeMirror .CodeMirror-linenumber {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+.modal-body {
+  word-break: break-word;
+}
+
+.btn-primary:disabled {
+  background-color: var(--bs-btn-disabled-bg, #e20074);
+  color: var(--bs-btn-disabled-color, #fff);
+}
+
+.btn-secondary:disabled {
+  background-color: var(--bs-btn-disabled-bg, #6c757d);
+  color: var(--text-on-primary, #ffffff);
+}
+
+.btn-secondary {
+  background-color: var(--bs-btn-active-bg, #6c757d);
+  color: var(--text-on-primary, #ffffff);
+}
+
+/* tnap-column-settings dropdown is rendered via ngbDropdown container="body",
+   so it lives outside any component host – ::ng-deep cannot reach it.
+   This global rule targets the portaled dropdown menu directly. */
+.tnap-table-columns-dropdown-menu tnap-checkbox .form-check {
+  margin-left: 0.5rem;
+}
+
+.upgrade-workflows-modal-backdrop {
+  z-index: 1050;
+}
+
+.upgrade-workflows-modal-window {
+  z-index: 1055;
+}
+
+.upgrade-workflows-modal-window .modal-body {
+  max-height: 62vh;
+  overflow-y: auto;
+}
+
+.upgrade-workflows-modal-window .modal-content {
+  border: 0;
+  box-shadow: 0 1rem 2.5rem var(--bs-box-shadow);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.upgrade-workflows-modal-window .modal-title {
+  font-weight: 600;
+  color: var(--bs-body-color);
+  line-height: 1.15;
+}
+
+.form-floating > label::after {
+  display: none !important;
+}
+.form-floating > .form-control {
+  font-size: var(--font-size-sm) !important;
+}
+.form-floating > .form-control,
+.form-floating > .form-control-plaintext,
+.form-floating > .form-select {
+  height: calc(3rem + calc(var(--bs-border-width) * 2));
+  min-height: calc(3rem + calc(var(--bs-border-width) * 2)) !important;
+}
+
+.form-floating > .form-control:focus,
+.form-floating > .form-control:not(:placeholder-shown),
+.form-floating > .form-control-plaintext:focus,
+.form-floating > .form-control-plaintext:not(:placeholder-shown) {
+  padding-top: 1rem !important;
+  padding-bottom: 0rem !important;
+}
+
+/* Execute result panel: semi-transparent backdrop matches Bootstrap confirm-modal appearance */
+.execute-result-overlay-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* ── Cell-site map: site hover tooltip ──────────────────────────────────────
+ * Overrides Leaflet's default tooltip styles to match the Figma design
+ * (node 83:6674 in fyPHyTdxpLyTnnOie7SSHx).
+ */
+.leaflet-tooltip.site-hover-tooltip {
+  background-color: #f8f9fa;
+  border: 1px solid #c6c6c8;
+  border-radius: 4px;
+  box-shadow:
+    4px -4px 4px rgba(202, 202, 202, 0.4),
+    -4px 4px 4px rgba(202, 202, 202, 0.4);
+  padding: 8px 12px;
+  color: #000000;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.leaflet-tooltip-top.site-hover-tooltip::before {
+  border-top-color: #c6c6c8;
+}
+
+.site-hover-tooltip-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Cell-site map: cell coverage tooltip ─────────────────────────────
+ * Overrides Leaflet's default tooltip styles to match the Figma design
+ * (node 55:8229 in fyPHyTdxpLyTnnOie7SSHx).
+ */
+.leaflet-tooltip.cell-coverage-tooltip {
+  background-color: #f8f9fa;
+  border: 1px solid #c6c6c8;
+  border-radius: 12px;
+  box-shadow:
+    4px -4px 4px rgba(202, 202, 202, 0.4),
+    -4px 4px 4px rgba(202, 202, 202, 0.4);
+  padding: 16px;
+  color: #000000;
+  white-space: nowrap;
+}
+
+.leaflet-tooltip-top.cell-coverage-tooltip::before {
+  border-top-color: #c6c6c8;
+}
+
+.cell-coverage-tooltip-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+}
+
+.cell-coverage-tooltip-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cell-coverage-tooltip-name {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: #000000;
+}
+
+.cell-coverage-tooltip-divider {
+  height: 1px;
+  background-color: #c6c6c8;
+  opacity: 0.25;
+  margin: 8px 0;
+}
+
+.cell-coverage-tooltip-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cell-coverage-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-left: 4px;
+}
+
+.cell-coverage-tooltip-label {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.cell-coverage-tooltip-value {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.5px;
+  color: #000000;
+  text-align: right;
+}
